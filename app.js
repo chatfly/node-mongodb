@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(methodOverride('_method'));
 
-const url = 'mongodb://127.0.0.1:27017/';
+const url = 'bd';
 const dbName = 'livraria';
 const collectionName = 'livros';
 
@@ -23,7 +23,7 @@ app.get('/cadastro', (req, res) => {
 app.post('/cadastro', async (req, res) => {
     const novoLivro = req.body;
 
-    const client = MongoClient(url);
+    const client = new MongoClient(url);
 
     try{
         await client.connect();
@@ -41,9 +41,13 @@ app.post('/cadastro', async (req, res) => {
     } finally {
         client.close();
     }
-})
+});
 
-app.get('/atualizar', async (req, res) => {
+app.get('/atualizar', (req,res) => {
+    res.sendFile(__dirname + '/atualizar.html');
+});
+
+app.post('/atualizar', async (req, res) => {
     const { id, titulo, autor, ano_publicacao, genero, editora, paginas, idioma, ISBN, disponivel } = req.body;
 
     const client = new MongoClient(url);
@@ -64,6 +68,7 @@ app.get('/atualizar', async (req, res) => {
                     genero,
                     editora,
                     paginas,
+                    idioma,
                     ISBN,
                     disponivel: disponivel === "true"
                 }
@@ -138,7 +143,7 @@ app.post('/deletar', async (req, res) => {
 });
 
 app.get('/livros', async (req, res) => {
-    const client = MongoClient(url);
+    const client = new MongoClient(url);
 
     try{
         await client.connect();
