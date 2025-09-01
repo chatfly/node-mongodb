@@ -136,3 +136,26 @@ app.post('/deletar', async (req, res) => {
         client.close();
     }
 });
+
+app.get('/livros', async (req, res) => {
+    const client = MongoClient(url);
+
+    try{
+        await client.connect();
+        const db = client.db(dbName);
+        const collection = db.collection(collectionName);
+
+        const livros = await collection.find({}, { projection: { _id: 1, titulo: 1, autor: 1, editora: 1} }).toArray();
+
+        res.json(livros);
+    } catch(err){
+        console.error('Erro ao buscar os livros:', err);
+        res.status(500).send('Erro ao buscar os livros livro. Por favor, tente novamente mais tarde.');
+    } finally{
+        client.close();
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Servidor Node.js rodando em execução em http://localhost:${port}`);
+});
